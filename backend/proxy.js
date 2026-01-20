@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 // Allowed origin(s)
 const ALLOWED_ORIGINS = ["*"]; // Replace with your frontend domain in production
 
-export function middleware(req) {
+export function proxy(req) {
   // Handle preflight OPTIONS request
   if (req.method === "OPTIONS") {
     const res = new NextResponse(null, { status: 204 }); // ✅ no body
