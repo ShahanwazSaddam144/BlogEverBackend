@@ -4,8 +4,8 @@ const APP_SECRET = process.env.APP_SECRET;
 const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
 const SID = process.env.SID;
 
-const privateKey = process.env.PRIVATE_KEY;
-const publicKey = process.env.PUBLIC_KEY;
+const privateKey = process.env.PRIVATE_KEY.replace(/\\n/g, "\n");
+const publicKey = process.env.PUBLIC_KEY.replace(/\\n/g, "\n");
 
 if (!APP_SECRET) throw new Error("Please set APP_SECRET in env");
 
