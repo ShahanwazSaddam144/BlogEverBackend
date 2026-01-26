@@ -178,9 +178,7 @@ export default async function VerifyPage({ params }) {
                   <p style={{ margin: 0, color: "#475569" }}>
                     This verification link looks invalid or has expired. Request a new verification email from the app.
                   </p>
-                  <div style={{ marginTop: 18 }}>
-                    <ActionButton href={homeUrl} color="#2563eb">Request new verification</ActionButton>
-                  </div>
+                 
                 </div>
               </div>
             </Body>
@@ -253,9 +251,7 @@ export default async function VerifyPage({ params }) {
                   <div style={{ flex: 1 }}>
                     <h2 style={{ margin: "0 0 8px 0", color: "#059669", fontSize: 20 }}>Already verified</h2>
                     <p style={{ margin: 0, color: "#475569" }}>Your account is already verified. You can sign in.</p>
-                    <div style={{ marginTop: 14 }}>
-                      <ActionButton href={loginUrl} color="#2563eb">Go to sign in</ActionButton>
-                    </div>
+                    
                   </div>
                 </div>
               </Body>
@@ -291,9 +287,7 @@ export default async function VerifyPage({ params }) {
                   <p style={{ margin: 0, color: "#475569" }}>
                     Thanks — your email has been verified. Welcome to {APP_NAME}.
                   </p>
-                  <div style={{ marginTop: 14 }}>
-                    <ActionButton href={loginUrl} color="#2563eb">Sign in</ActionButton>
-                  </div>
+                 
                 </div>
               </div>
             </Body>
@@ -336,9 +330,7 @@ export default async function VerifyPage({ params }) {
                 <div style={{ flex: 1 }}>
                   <h2 style={{ margin: "0 0 8px 0", color: "#059669", fontSize: 20 }}>Already verified</h2>
                   <p style={{ margin: 0, color: "#475569" }}>Your account is already verified. You can sign in.</p>
-                  <div style={{ marginTop: 14 }}>
-                    <ActionButton href={loginUrl} color="#2563eb">Go to sign in</ActionButton>
-                  </div>
+               
                 </div>
               </div>
             </Body>
@@ -417,9 +409,7 @@ export default async function VerifyPage({ params }) {
               <div style={{ flex: 1 }}>
                 <h2 style={{ margin: "0 0 8px 0", color: "#059669", fontSize: 20 }}>Account verified</h2>
                 <p style={{ margin: 0, color: "#475569" }}>Thanks — your email has been verified. Welcome to {APP_NAME}.</p>
-                <div style={{ marginTop: 14 }}>
-                  <ActionButton href={loginUrl} color="#2563eb">Sign in</ActionButton>
-                </div>
+              
               </div>
             </div>
           </Body>
@@ -439,9 +429,7 @@ export default async function VerifyPage({ params }) {
               <div style={{ flex: 1 }}>
                 <h2 style={{ margin: "0 0 8px 0", color: "#b91c1c", fontSize: 20 }}>Server error</h2>
                 <p style={{ margin: 0, color: "#475569" }}>Something went wrong while verifying your account. Try again later.</p>
-                <div style={{ marginTop: 18 }}>
-                  <ActionButton href={homeUrl} color="#2563eb">Go to homepage</ActionButton>
-                </div>
+              
               </div>
             </div>
           </Body>
