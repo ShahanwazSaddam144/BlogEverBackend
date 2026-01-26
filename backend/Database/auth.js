@@ -15,8 +15,6 @@ const userSchema = new mongoose.Schema(
 
 userSchema.index({ verificationTokenExpires: 1 }, { expireAfterSeconds: 0 });
 
-userSchema.index({ email: 1 });
-
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 export default User;
