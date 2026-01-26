@@ -149,9 +149,7 @@ export default async function VerifyPage({ params }) {
               <div style={{ flex: 1 }}>
                 <h2 style={{ margin: "0 0 8px 0", color: "#0f172a", fontSize: 20 }}>Invalid request</h2>
                 <p style={{ margin: 0, color: "#475569" }}>No verification token was provided in the URL.</p>
-                <div style={{ marginTop: 18 }}>
-                  <ActionButton href={homeUrl} color="#2563eb">Go to homepage</ActionButton>
-                </div>
+               
               </div>
             </div>
           </Body>
