@@ -25,7 +25,7 @@ export async function POST(req) {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return json({ message: "Invalid email or password" }, 401);
 
-    const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign({ id: user._id, email: user.email }, { expiresIn: "7d" });
     user.tokens.push({ token });
     await user.save();
 
