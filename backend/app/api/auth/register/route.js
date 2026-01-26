@@ -1,16 +1,10 @@
 // app/api/auth/register/route.js
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import jwt from "NextResponse.jsonwebtoken";
 import { connectToDb } from "@/app/utils/mongo";
 import User from "@/Database/auth";
-
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) throw new Error("Please set JWT_SECRET in env");
-
-function json(data, status = 200) {
-  return NextResponse.json(data, { status });
-}
+import { generateToken } from "@/app/utils/token";
 
 // async function sendVerificationEmailSafe(to, name, url) {
 //   try {
@@ -26,33 +20,53 @@ function json(data, status = 200) {
 //   console.log("No mailer configured — verification URL:", url);
 //   return Promise.resolve();
 // }
+const emailNameRegex = /^[a-zA-Z0-9]+([._-]?[a-zA-Z0-9]+)*$/;
+
+// Usage
+function validateEmailName(name) {
+  if (typeof name !== "string") throw new Error("name must be a string");
+  return emailNameRegex.test(name);
+}
 
 export async function POST(req) {
   await connectToDb();
-
   try {
-    const body = await req.json();
+    const body = await req.NextResponse.json();
     const { name, email, password } = body;
 
     if (!name || !email || !password) {
-      return json({ message: "Please fill all fields" }, 400);
+      return NextResponse.json({ message: "Please fill all fields" }, {status:400});
+    }
+    if (!validateEmailName(email)) {
+      return NextResponse.json({ message: "Invalid email" }, {status:400});
     }
 
-    const existing = await User.findOne({ email });
-    if (existing) return json({ message: "User already exists" }, 400);
+    if (typeof name !== "string") return NextResponse.json({ message: "Invalid name" }, {status:400});
 
+    if (typeof password !== "string")
+      return NextResponse.json({ message: "Invalid password" }, {status:400});
+    if (password.length < 8)
+      return NextResponse.json({ message: "Password must be at least 8 characters" }, {status:400});
+    if(password.length>25)
+      return NextResponse.json({ message: "Password must be less than 25 characters" }, {status:400});
+    const existing = await User.findOne({ email });
+    if (existing) return NextResponse.json({ message: "User already exists" }, 400);
     const hashed = await bcrypt.hash(password, 10);
     const newUser = new User({
       name,
       email,
       password: hashed,
       isVerified: false,
-      tokens: [],
+      tokenVersion: 0,
     });
 
     await newUser.save();
 
-    const verifyToken = jwt.sign({ id: newUser._id, email: newUser.email }, JWT_SECRET, { expiresIn: "1d" });
+    const verifyToken = jwt.sign(
+      { id: newUser._id, email: newUser.email },
+      JWT_SECRET,
+      { expiresIn: "1d" },
+    );
     newUser.verifyToken = verifyToken;
     await newUser.save();
 
@@ -64,9 +78,16 @@ export async function POST(req) {
     //   console.log("Email not sent:", err)
     // );
 
-    return json({ success: true, message: "Account created! Please check your email to verify your account." }, 201);
+    return NextResponse.json(
+      {
+        success: true,
+        message:
+          "Account created! Please check your email to verify your account.",
+      },
+      201,
+    );
   } catch (err) {
     console.error("Signup Error:", err);
-    return json({ message: "Server error" }, 500);
+    return NextResponse.json({ message: "Server error" }, 500);
   }
 }

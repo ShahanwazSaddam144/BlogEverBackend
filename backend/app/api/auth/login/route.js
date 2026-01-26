@@ -5,9 +5,6 @@ import jwt from "jsonwebtoken";
 import { connectToDb } from "@/app/utils/mongo";
 import User from "@/Database/auth";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) throw new Error("Please set JWT_SECRET in env");
-
 function json(data, status = 200) {
   return NextResponse.json(data, { status });
 }
