@@ -8,7 +8,13 @@ export async function POST(req) {
   await connectToDb();
 
   try {
-    const body = await req.json();
+    let body = {};
+    try {
+      body = await req.json();
+    } catch (err) {
+      return NextResponse.json({ message: "Invalid JSON body" }, { status: 400 });
+    }
+
     const { email, password } = body;
     if (typeof email !== "string" || typeof password !== "string") {
       return NextResponse.json({ message: "Please fill all fields" }, {status:400});
