@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import User from "@/models/User";
-import { redisGet, redisSet, redisDel } from "@/lib/redisUtils";
-import { verifyVerificationToken } from "@/utils/jwt";
+import User from "@/Database/auth";
+import { redisGet, redisSet, redisDel } from "@/app/utils/redis";
+import { verifyVerificationToken } from "@/app/utils/token";
 import { connectToDb } from "@/app/utils/mongo";
 
 export async function GET(req) {
