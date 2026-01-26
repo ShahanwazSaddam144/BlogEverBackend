@@ -4,9 +4,10 @@ import { redisGet, redisSet, redisDel } from "@/app/utils/redis";
 import { verifyVerificationToken } from "@/app/utils/token";
 import { connectToDb } from "@/app/utils/mongo";
 
-export async function GET(req) {
+export async function GET(req, { params }){
   try {
-    const providedToken = params?.verifyToken;
+    const param =await params;
+    const {token:providedToken}=param;
 
     if (!providedToken || typeof providedToken !== "string") {
       return NextResponse.json({ error: "verifyToken is required in the path" }, { status: 400 });
