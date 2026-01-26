@@ -129,7 +129,8 @@ function ActionButton({ href, children, color = "#2563eb" }) {
 /* ---------- main server component (SSR) ---------- */
 
 export default async function VerifyPage({ params }) {
-  const token = params?.token;
+  const param = await params;
+  const token = param?.token;
   const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || process.env.APP_NAME || "BlogEver";
   const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || process.env.APP_URL || "").replace(/\/$/, "") || "";
   const loginUrl = baseUrl ? `${baseUrl}/login` : "/login";
