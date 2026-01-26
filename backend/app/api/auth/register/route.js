@@ -20,9 +20,9 @@ import { generateToken } from "@/app/utils/token";
 //   console.log("No mailer configured — verification URL:", url);
 //   return Promise.resolve();
 // }
+
 const emailNameRegex = /^[a-zA-Z0-9]+([._-]?[a-zA-Z0-9]+)*$/;
 
-// Usage
 function validateEmailName(name) {
   if (typeof name !== "string") throw new Error("name must be a string");
   return emailNameRegex.test(name);
@@ -72,11 +72,6 @@ export async function POST(req) {
 
     const origin = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
     const verifyUrl = `${origin}/api/auth/verify/${verifyToken}`;
-
-    // send email if mailer exists, otherwise log the link
-    // sendVerificationEmailSafe(newUser.email, newUser.name, verifyUrl).catch((err) =>
-    //   console.log("Email not sent:", err)
-    // );
 
     return NextResponse.json(
       {

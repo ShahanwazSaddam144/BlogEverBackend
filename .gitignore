@@ -30,6 +30,8 @@ yarn-error.log*
 
 # vercel
 .vercel
+#private keys
+*.key
 
 # typescript
 *.tsbuildinfo
