@@ -4,9 +4,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { connectToDb } from "@/app/utils/mongo";
 import User from "@/Database/auth";
-import { NextResponse } from "next/server";
-
-
 export async function POST(req) {
   await connectToDb();
 
