@@ -7,7 +7,7 @@ const ALLOWED_ORIGINS = ["*"]; // Replace with your frontend domain in productio
 export function proxy(req) {
   // Handle preflight OPTIONS request
   if (req.method === "OPTIONS") {
-    const res = new NextResponse(null, { status: 204 }); // ✅ no body
+    const res = new NextResponse(null, { status: 204 }); 
     res.headers.set("Access-Control-Allow-Origin", ALLOWED_ORIGINS.join(","));
     res.headers.set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
     res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
