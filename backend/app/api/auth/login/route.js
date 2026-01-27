@@ -36,7 +36,7 @@ export async function POST(req) {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return NextResponse.json({ message: "Invalid email or password" }, {status:401});
 
-    const authToken = generateToken(user,"AUTH","1h");
+    const accessToken = generateToken(user,"AUTH","1h");
     const refreshToken = generateToken(user,"REFRESH","7d");
 
     return NextResponse.json(
@@ -47,7 +47,7 @@ export async function POST(req) {
           email: user.email,
           isVerified: user.isVerified,
         },
-        authToken,
+        accessToken,
         refreshToken
       },
       {status:200},
