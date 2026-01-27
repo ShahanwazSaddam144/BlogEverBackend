@@ -133,8 +133,6 @@ export default async function VerifyPage({ params }) {
   const token = param?.token;
   const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || process.env.APP_NAME || "BlogEver";
   const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || process.env.APP_URL || "").replace(/\/$/, "") || "";
-  const loginUrl = baseUrl ? `${baseUrl}/login` : "/login";
-  const homeUrl = baseUrl || "/";
 
   // quick invalid token page
   if (!token || typeof token !== "string") {
