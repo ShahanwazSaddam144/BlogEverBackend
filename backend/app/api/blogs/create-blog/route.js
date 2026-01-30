@@ -24,7 +24,7 @@ export async function POST(req) {
     if (!token) {
       return NextResponse.json({ message: "Missing token" }, { status: 401 });
     }
-    const decoded = verifyToken(token, "AUTH");
+    const decoded = verifyToken(token, "APP");
     if (!decoded && !decoded.email && !decoded.name) {
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }

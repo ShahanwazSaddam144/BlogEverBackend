@@ -12,7 +12,7 @@ export async function GET(req) {
     if(!token){
       return NextResponse.json({message:"Missing token"},{status:401});
     }
-    const decoded = verifyToken(token,"AUTH");
+    const decoded = verifyToken(token,"APP");
     if(!decoded && !decoded.email){
       return NextResponse.json({message:"Invalid token"},{status:401});
     }
