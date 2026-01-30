@@ -1,15 +1,17 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const blogSchema = new mongoose.Schema({
-    email: { type: String, required: true },
-    createdby: { type: String, required: true },
-    name: { type: String, required: true },
-    desc: { type: String, required: true },
-    category: { type: String, required: true },
-    publishedAt: { type: Date, default: Date.now },
+  email: { type: String, required: true },
+  createdby: { type: String, required: true },
+  name: { type: String, required: true },
+  desc: { type: String, required: true },
+  category: { type: String, required: true },
+  publishedAt: { type: Date, default: Date.now },
+  image: {
+    url: String,
+    fileName: String,
+    uploadId: String,
+  }
 });
 
-// Prevent recompiling the model if it already exists
-const Blog = mongoose.models.Blog || mongoose.model("Blog", blogSchema);
-
-export default Blog;
+export default mongoose.models.Blog || mongoose.model('Blog', blogSchema);
