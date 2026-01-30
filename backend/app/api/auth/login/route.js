@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { generateToken } from "@/app/utils/token";
 import { connectToDb } from "@/app/utils/mongo";
 import User from "@/Database/auth";
+import validator from "validator";
 export async function POST(req) {
   await connectToDb();
 
@@ -25,8 +26,12 @@ export async function POST(req) {
         { status: 400 },
       );
     }
+    if (!validator.isEmail(email)) {
+      return NextResponse.json({ message: "Invalid email" }, { status: 400 });
+    }
+
     const user = await User.findOne({ email }).lean();
-    if (!user) return json({ message: "User not found" }, 404);
+    if (!user) return NextResponse.json({ message: "User not found" }, {status:401});
     if (!user?.isVerified)
       return NextResponse.json(
         { message: "Please verify your email before logging in" },
