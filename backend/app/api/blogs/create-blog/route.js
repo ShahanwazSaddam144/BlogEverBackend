@@ -1,9 +1,11 @@
 // app/api/blogs/route.js
 import { NextResponse } from "next/server";
-import { connectToDb as connectToDatabase} from "@/app/utils/mongo";
+import { connectToDb as connectToDatabase } from "@/app/utils/mongo";
 import cloudinary from "@/app/utils/cloudinaryConfig";
 import Blog from "@/app/../Database/blogs"; // adjust path if your model is elsewhere
-
+import { headers } from "next/headers";
+import { verifyToken } from "@/app/utils/token";
+import { validate } from "uuid";
 
 function parseCloudinaryPublicId(url) {
   try {
@@ -17,12 +19,33 @@ function parseCloudinaryPublicId(url) {
 
 export async function POST(req) {
   try {
+    const headersList = await headers();
+    const token = headersList.get("authorization");
+    if (!token) {
+      return NextResponse.json({ message: "Missing token" }, { status: 401 });
+    }
+    const decoded = verifyToken(token, "AUTH");
+    if (!decoded && !decoded.email && !decoded.name) {
+      return NextResponse.json({ message: "Invalid token" }, { status: 401 });
+    }
+    const { email,name:author } = decoded;
+    if (!email && !validator.isEmail(email)) {
+      return NextResponse.json({ message: "Invalid email" }, { status: 401 });
+    }
     const body = await req.json();
 
-    // Validate required fields
-    const { title, body: desc, category, publishedAt, author, email, cdnImageUrl } = body;
+    const {
+      title,
+      body: desc,
+      category,
+      publishedAt,
+      cdnImageUrl,
+    } = body;
     if (!title || !desc || !category) {
-      return NextResponse.json({ error: "Missing required fields (title, body, category)" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing required fields (title, body, category)" },
+        { status: 400 },
+      );
     }
 
     await connectToDatabase();
@@ -41,10 +64,13 @@ export async function POST(req) {
       try {
         if (publicId) {
           // cloudinary.api.resource will throw if not found
-          const resource = await cloudinary.api.resource(publicId, { resource_type: "image" });
+          const resource = await cloudinary.api.resource(publicId, {
+            resource_type: "image",
+          });
           // If no throw, resource exists
           uploadConfirmed = true;
-          image.fileName = resource.original_filename || publicId.split("/").pop();
+          image.fileName =
+            resource.original_filename || publicId.split("/").pop();
           image.uploadId = resource.public_id || publicId;
           // ensure we store the canonical secure_url if available
           image.url = resource.secure_url || cdnImageUrl;
@@ -69,7 +95,7 @@ export async function POST(req) {
     // Create the blog document using your schema mapping
     // Your schema expects: email, createdby, name, desc, category, publishedAt, image
     const blogDoc = await Blog.create({
-      email: email || "testing",
+      email: email || "",
       createdby: author || "",
       name: title,
       desc,
@@ -84,10 +110,13 @@ export async function POST(req) {
         blog: blogDoc,
         uploadConfirmed,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (err) {
     console.error("create blog error:", err);
-    return NextResponse.json({ error: "Failed to create blog", details: err.message || String(err) }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create blog", details: err.message || String(err) },
+      { status: 500 },
+    );
   }
 }

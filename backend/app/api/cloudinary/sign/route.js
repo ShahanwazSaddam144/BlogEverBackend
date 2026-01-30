@@ -1,8 +1,20 @@
 import cloudinary from "@/app/utils/cloudinaryConfig";
 import crypto from "crypto";
 import { NextResponse } from "next/server";
+import { verifyToken } from "@/app/utils/token";
+import { headers } from "next/headers";
 export async function GET(req) {
   try {
+    const headersList= await headers();
+    const token = headersList.get("authorization");
+    if(!token){
+      return NextResponse.json({message:"Missing token"},{status:401});
+    }
+    const decoded = verifyToken(token,"AUTH");
+    if(!decoded){
+      return NextResponse.json({message:"Invalid token"},{status:401});
+    }
+
     const timestamp = Math.floor(Date.now() / 1000);
     const folder = "blog_images";
     const upload_preset = "BlogEver";

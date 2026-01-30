@@ -1,11 +1,22 @@
 import { NextResponse } from "next/server";
 import {connectToDb} from "@/app/utils/mongo";
 import Blog from "@/app/../Database/blogs";
+import { headers } from "next/headers";
+import { verifyToken } from "@/app/utils/token";
 
 export async function GET(req) {
   try {
     await connectToDb();
-
+    const headersList= await headers();
+    const token = headersList.get("authorization");
+    if(!token){
+      return NextResponse.json({message:"Missing token"},{status:401});
+    }
+    const decoded = verifyToken(token,"AUTH");
+    if(!decoded && !decoded.email){
+      return NextResponse.json({message:"Invalid token"},{status:401});
+    }
+    
     const { searchParams } = new URL(req.url);
 
     // pagination params
