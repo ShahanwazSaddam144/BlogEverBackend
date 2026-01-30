@@ -70,7 +70,7 @@ function escapeHtml(value) {
  */
 export function verificationTemplate(name, token) {
   const safeName = escapeHtml(name || "there");
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const baseUrl = "https://api.blogever.buttnetworks.com";
   if (!baseUrl) throw new Error("NEXT_PUBLIC_BASE_URL is not defined");
   const verificationLink = `${baseUrl.replace(/\/$/, "")}/api/auth/verify/${encodeURIComponent(
     token,
