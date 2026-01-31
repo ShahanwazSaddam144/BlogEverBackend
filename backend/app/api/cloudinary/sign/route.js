@@ -1,3 +1,4 @@
+
 import cloudinary from "@/app/utils/cloudinaryConfig";
 import crypto from "crypto";
 import { NextResponse } from "next/server";
@@ -28,7 +29,7 @@ export async function GET(req) {
         timestamp,
         signature,
         folder,
-        upload_preset, // Send this back so frontend stays in sync
+        upload_preset, 
         apiKey: cloudinary.config().api_key,
         cloudName: cloudinary.config().cloud_name,
       },

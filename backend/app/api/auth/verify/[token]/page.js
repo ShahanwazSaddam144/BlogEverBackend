@@ -263,8 +263,7 @@ export default async function VerifyPage({ params }) {
         verificationToken: null,
         verificationTokenExpires: null,
       });
-
-      // best-effort cleanup
+      
       try {
         await redisDel(redisKey);
       } catch (e) {

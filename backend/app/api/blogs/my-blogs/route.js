@@ -25,12 +25,12 @@ export async function GET(req) {
     }
 
     const userId = decoded.user._id;
-
-    if (!isValidObjectId(userId)) {
+    const objectId = new mongoose.Types.ObjectId(userId);
+    if (!isValidObjectId(objectId)) {
       return NextResponse.json({ message: "Invalid User ID format" }, { status: 400 });
     }
 
-    const userBlogs = await Blog.find({ userid: userId })
+    const userBlogs = await Blog.find({ userid: objectId })
       .select("name") 
       .lean(); 
 
