@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { connectToDb } from "@/app/utils/mongo";
 import Blog from "@/Database/blogs"; // Ensure this is your Mongoose model
 import { isValidObjectId } from "mongoose";
-
+import mongoose from "mongoose";
 export async function GET(req) {
   try {
     await connectToDb();
