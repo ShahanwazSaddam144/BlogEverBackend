@@ -5,7 +5,7 @@ import cloudinary from "@/app/utils/cloudinaryConfig";
 import Blog from "@/app/../Database/blogs"; // adjust path if your model is elsewhere
 import { headers } from "next/headers";
 import { verifyToken } from "@/app/utils/token";
-import { validate } from "uuid";
+import validator from "validator";
 
 function parseCloudinaryPublicId(url) {
   try {
@@ -29,7 +29,8 @@ export async function POST(req) {
     if (!decoded && !decoded.email && !decoded.name) {
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
-    const { email,name:author } = decoded;
+    const { email,name:author } = decoded?.user;
+
     if (!email && !validator.isEmail(email)) {
       return NextResponse.json({ message: "Invalid email" }, { status: 401 });
     }
