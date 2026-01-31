@@ -1,83 +1,76 @@
 import jwt from "jsonwebtoken";
 
-const APP_SECRET = process.env.APP_SECRET;
-const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
-const SID = process.env.SID;
+/* =========================
+   ENV VARIABLES
+========================= */
 
-const privateKey = process.env.PRIVATE_KEY.replace(/\\n/g, "\n");
-const publicKey = process.env.PUBLIC_KEY.replace(/\\n/g, "\n");
+const {
+  APP_SECRET,
+  REFRESH_TOKEN,
+  SID,
+  PRIVATE_KEY,
+  PUBLIC_KEY,
+} = process.env;
 
-if (!APP_SECRET) throw new Error("Please set APP_SECRET in env");
+if (!APP_SECRET) throw new Error("APP_SECRET is missing in env");
+if (!REFRESH_TOKEN) throw new Error("REFRESH_TOKEN is missing in env");
+if (!SID) throw new Error("SID is missing in env");
+if (!PRIVATE_KEY) throw new Error("PRIVATE_KEY is missing in env");
+if (!PUBLIC_KEY) throw new Error("PUBLIC_KEY is missing in env");
 
-function selectToken(type) {
-  try {
-    let type;
-    switch (type) {
-      case "APP":
-        type = APP_SECRET;
-        break;
-      case "REFRESH":
-        type = REFRESH_TOKEN;
-        break;
-      case "SID":
-        type = SID;
-        break;
-      default:
-        type = APP_SECRET;
-        break;
-    }
-    return type;
-  } catch (err) {
-    console.log(err);
-    return false;
+const privateKey = PRIVATE_KEY.replace(/\\n/g, "\n");
+const publicKey = PUBLIC_KEY.replace(/\\n/g, "\n");
+
+/* =========================
+   TOKEN SECRET SELECTOR
+========================= */
+
+function selectSecret(tokenType = "APP") {
+  switch (tokenType) {
+    case "APP":
+      return APP_SECRET;
+    case "REFRESH":
+      return REFRESH_TOKEN;
+    case "SID":
+      return SID;
+    default:
+      return APP_SECRET;
   }
+}
+
+/* =========================
+   ACCESS / REFRESH TOKENS
+========================= */
+
+export function generateToken(payload, type = "APP", expiresIn = "1h") {
+  if (!payload) throw new Error("Payload is required");
+
+  const secret = selectSecret(type);
+  if (!secret) throw new Error("Invalid token type");
+
+  return jwt.sign(payload, secret, { expiresIn });
 }
 
 export function verifyToken(token, type = "APP") {
+  if (!token) return null;
+
   try {
-    const secret = selectToken(type);
-    if (!secret) {
-      console.error("missing type");
-      return false;
-    }
-    if (!token) {
-      console.error("missing token");
-      return false;
-    }
-    const decoded = jwt.verify(token, secret);
-    return decoded;
-  } catch (err) {
-    console.log(err);
-    return false;
-  }
-}
-export function generateToken(user, type = "APP", expiresIn = "1h") {
-  try {
-    const secret = selectToken(type);
-    if (!secret) {
-      console.error("missing type");
-      return false;
-    }
-    if (!user) {
-      console.error("missing user or user.uid");
-      return false;
-    }
-    const token = jwt.sign({ user }, secret, { expiresIn });
-    return token;
-  } catch (err) {
-    console.log(err);
-    return false;
+    const secret = selectSecret(type);
+    return jwt.verify(token, secret);
+  } catch {
+    return null;
   }
 }
 
-if (!privateKey || !publicKey) {
-  throw new Error(
-    "JWT private/public keys are not defined in environment variables",
-  );
-}
+/* =========================
+   EMAIL VERIFICATION TOKENS (RSA)
+========================= */
 
 export function generateVerificationToken(userId) {
-  if (typeof userId !== "string") throw new Error("userId must be a string");
+  if (typeof userId !== "string") {
+    throw new Error("userId must be a string");
+  }
+
   return jwt.sign(
     {
       sub: userId,
@@ -87,14 +80,17 @@ export function generateVerificationToken(userId) {
     {
       algorithm: "RS256",
       expiresIn: "1d",
-    },
+    }
   );
 }
 
 export function verifyVerificationToken(token) {
-  if (typeof token !== "string") throw new Error("token must be a string");
+  if (!token) return null;
+
   try {
-    return jwt.verify(token, publicKey, { algorithms: ["RS256"] });
+    return jwt.verify(token, publicKey, {
+      algorithms: ["RS256"],
+    });
   } catch {
     return null;
   }
