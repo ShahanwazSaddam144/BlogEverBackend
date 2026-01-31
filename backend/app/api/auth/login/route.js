@@ -56,15 +56,23 @@ export async function POST(req) {
       );
     }
 
-    const accessToken = generateToken(user, "APP", "1h");
-    const refreshToken = generateToken(user, "REFRESH", "7d");
+    const payload = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      isVerified: user.isVerified, 
+    };
+
+    // Generate tokens using only this safe payload
+    const accessToken = generateToken(payload, "APP", "1h");
+    const refreshToken = generateToken(payload, "REFRESH", "7d");
 
     // 6. Create Response with HttpOnly Cookie
     const response = NextResponse.json(
       {
         success: true,
         user: { name: user.name, email: user.email },
-        accessToken, // Access token can stay in memory/JSON
+        accessToken, 
       },
       { status: 200 },
     );
