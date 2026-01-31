@@ -56,8 +56,7 @@ export async function POST(req) {
       );
     }
 
-    // 5. Token Generation
-    const accessToken = generateToken(user, "AUTH", "1h");
+    const accessToken = generateToken(user, "APP", "1h");
     const refreshToken = generateToken(user, "REFRESH", "7d");
 
     // 6. Create Response with HttpOnly Cookie

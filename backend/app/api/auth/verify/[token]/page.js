@@ -5,8 +5,6 @@ import { redisGet, redisSet, redisDel } from "@/app/utils/redis";
 import { verifyVerificationToken } from "@/app/utils/token";
 import { connectToDb } from "@/app/utils/mongo";
 
-/* ---------- small UI pieces (inline styles only) ---------- */
-
 function Container({ children }) {
   return (
     <div
