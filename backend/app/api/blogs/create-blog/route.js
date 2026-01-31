@@ -20,7 +20,8 @@ function parseCloudinaryPublicId(url) {
 export async function POST(req) {
   try {
     const headersList = await headers();
-    const token = headersList.get("authorization");
+    const token = headersList.get("authorization").split(" ")[1];
+    
     if (!token) {
       return NextResponse.json({ message: "Missing token" }, { status: 401 });
     }
