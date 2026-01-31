@@ -35,7 +35,6 @@ export async function POST(req) {
       return NextResponse.json({ message: "Invalid email" }, { status: 401 });
     }
     const body = await req.json();
-
     const {
       title,
       body: desc,
@@ -97,6 +96,7 @@ export async function POST(req) {
     // Create the blog document using your schema mapping
     // Your schema expects: email, createdby, name, desc, category, publishedAt, image
     const blogDoc = await Blog.create({
+      userId:decoded.user._id,
       email: email || "",
       createdby: author || "",
       name: title,
