@@ -1,96 +1,95 @@
-// app/api/auth/register/route.js
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
 import { connectToDb } from "@/app/utils/mongo";
 import User from "@/Database/auth";
-import { generateVerificationToken } from "@/app/utils/token";
-import { redisSet } from "@/app/utils/redis";
-import { sendVerificationEmail } from "@/app/utils/mailer";
-import validator from "validator";
+import { verifyVerificationToken } from "@/app/utils/token";
+import { redisGet, redisDel } from "@/app/utils/redis";
 
-export async function POST(req) {
+export async function GET(req) {
   await connectToDb();
+
   try {
-   let body = {};
-    try {
-      body = await req.json();
-    } catch (err) {
-      return NextResponse.json({ message: "Invalid JSON body" }, { status: 400 });
-    }
+    const { searchParams } = new URL(req.url);
+    const token = searchParams.get("token");
 
-    const { name, email, password } = body;
-
-    if (!name || !email || !password) {
+    if (!token) {
       return NextResponse.json(
-        { message: "Please fill all fields" },
-        { status: 400 },
+        { message: "Verification token missing" },
+        { status: 400 }
       );
     }
 
-    if (!validator.isEmail(email)) {
-      return NextResponse.json({ message: "Invalid email" }, { status: 400 });
+    // 1️⃣ Verify JWT (RSA)
+    const decoded = verifyVerificationToken(token);
+    if (!decoded || decoded.type !== "account_verification") {
+      return NextResponse.json(
+        { message: "Invalid or expired token" },
+        { status: 400 }
+      );
     }
 
-    if (typeof name !== "string")
-      return NextResponse.json({ message: "Invalid name" }, { status: 400 });
+    const userId = decoded.sub;
 
-    if (typeof password !== "string")
+    // 2️⃣ Check Redis (extra security)
+    const redisKey = `verify:${userId}`;
+    const redisToken = await redisGet(redisKey);
+
+    if (!redisToken || redisToken !== token) {
       return NextResponse.json(
-        { message: "Invalid password" },
-        { status: 400 },
+        { message: "Token expired or already used" },
+        { status: 400 }
       );
-    if (password.length < 8)
-      return NextResponse.json(
-        { message: "Password must be at least 8 characters" },
-        { status: 400 },
-      );
-    if (password.length > 25)
-      return NextResponse.json(
-        { message: "Password must be less than 25 characters" },
-        { status: 400 },
-      );
-    const existing = await User.findOne({ email });
-    if (existing)
-      return NextResponse.json({ message: "User already exists" }, {status:400});
-    const hashed = await bcrypt.hash(password, 10);
-
-    const newUser = new User({
-      name,
-      email,
-      password: hashed,
-      isVerified: false,
-      tokenVersion: 0,
-    });
-
-    const token = generateVerificationToken(newUser._id.toString());
-
-    // 3️⃣ Set token and expiration in MongoDB
-    newUser.verificationToken = token;
-    newUser.verificationTokenExpires = new Date(
-      Date.now() + 24 * 60 * 60 * 1000,
-    );
-
-    await newUser.save();
-
-    const redisKey = `verify:${newUser._id.toString()}`;
-    await redisSet(redisKey, token, 24 * 60 * 60);
-
-    const origin = process.env.NEXT_PUBLIC_BASE_URL;
-    if (!origin) {
-      throw new Error("NEXT_PUBLIC_BASE_URL is not defined");
     }
-    await sendVerificationEmail(email, name, token);
+
+    // 3️⃣ Find user in DB
+    const user = await User.findById(userId);
+    if (!user) {
+      return NextResponse.json(
+        { message: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    // 4️⃣ Already verified
+    if (user.isVerified) {
+      return NextResponse.json(
+        { message: "Account already verified" },
+        { status: 200 }
+      );
+    }
+
+    // 5️⃣ Expiry check (MongoDB)
+    if (
+      !user.verificationTokenExpires ||
+      user.verificationTokenExpires < new Date()
+    ) {
+      return NextResponse.json(
+        { message: "Verification token expired" },
+        { status: 400 }
+      );
+    }
+
+    // 6️⃣ VERIFY USER (THIS IS WHY TOKEN BECOMES NULL)
+    user.isVerified = true;
+    user.verificationToken = null;
+    user.verificationTokenExpires = null;
+
+    await user.save();
+
+    // 7️⃣ Cleanup Redis
+    await redisDel(redisKey);
+
     return NextResponse.json(
       {
         success: true,
-        message:
-          "Account created! Please check your email to verify your account.",
-        token,
+        message: "Email verified successfully. You can now log in.",
       },
-      { status: 201 },
+      { status: 200 }
     );
   } catch (err) {
-    console.error("Signup Error:", err);
-    return NextResponse.json({ message: "Server error" }, {status:500});
+    console.error("Verification Error:", err);
+    return NextResponse.json(
+      { message: "Server error" },
+      { status: 500 }
+    );
   }
 }
