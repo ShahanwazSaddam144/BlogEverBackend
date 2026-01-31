@@ -30,7 +30,7 @@ export async function GET(req) {
       return NextResponse.json({ message: "Invalid User ID format" }, { status: 400 });
     }
 
-    const userBlogs = await Blog.find({ _id: userId })
+    const userBlogs = await Blog.find({ userid: userId })
       .select("name") 
       .lean(); 
 
