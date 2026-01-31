@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 export async function GET(req) {
   try {
     const headersList= await headers();
-    const token = headersList.get("authorization");
+    const token = headersList.get("authorization").split(" ")[1];
     if(!token){
       return NextResponse.json({message:"Missing token"},{status:401});
     }
