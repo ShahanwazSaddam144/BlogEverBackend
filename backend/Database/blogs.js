@@ -1,6 +1,12 @@
 import mongoose from 'mongoose';
 
 const blogSchema = new mongoose.Schema({
+  userId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User', 
+    required: true, 
+    index: true 
+  },
   email: { type: String, required: true },
   createdby: { type: String, required: true },
   name: { type: String, required: true },
@@ -13,5 +19,7 @@ const blogSchema = new mongoose.Schema({
     uploadId: String,
   }
 });
+
+
 
 export default mongoose.models.Blog || mongoose.model('Blog', blogSchema);
