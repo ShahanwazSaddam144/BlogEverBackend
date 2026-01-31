@@ -47,7 +47,7 @@ export async function POST(req) {
         name:user.name,
         tokenVersion: user.tokenVersion,
       },
-      "AUTH",
+      "APP",
       "1h"
     );
 
