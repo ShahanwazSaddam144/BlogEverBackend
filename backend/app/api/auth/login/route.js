@@ -13,75 +13,80 @@ export async function POST(req) {
     if (!body) {
       return NextResponse.json(
         { message: "Invalid JSON body" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     const { email, password } = body;
 
-    // 1. Validation
+    // 1️⃣ Validation
     if (!email || !password) {
       return NextResponse.json(
         { message: "Please fill all fields" },
-        { status: 400 },
+        { status: 400 }
       );
     }
+
     if (!validator.isEmail(email)) {
-      return NextResponse.json({ message: "Invalid email" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Invalid email" },
+        { status: 400 }
+      );
     }
 
-    // 2. Database Lookup
-    const user = await User.findOne({ email }).lean();
+    // 2️⃣ Database Lookup
+    const user = await User.findOne({ email });
     if (!user) {
       return NextResponse.json(
         { message: "Invalid email or password" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
-    // 3. Verification Check
+    // 3️⃣ Email Verification
     if (!user.isVerified) {
       return NextResponse.json(
         { message: "Please verify your email" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
-    // 4. Password Match
+    // 4️⃣ Password Check
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return NextResponse.json(
         { message: "Invalid email or password" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
-    // 5. Token Generation
-    const accessToken = generateToken(user, "AUTH", "1h");
-    const refreshToken = generateToken(user, "REFRESH", "7d");
+    // 5️⃣ Token Generation (SAFE PAYLOAD)
+    const tokenPayload = {
+      id: user._id.toString(),
+      email: user.email,
+    };
 
-    // 6. Create Response with HttpOnly Cookie
-    const response = NextResponse.json(
+    const accessToken = generateToken(tokenPayload, "AUTH", "1h");
+    const refreshToken = generateToken(tokenPayload, "REFRESH", "7d");
+
+    // 6️⃣ RESPONSE (React Native Compatible)
+    return NextResponse.json(
       {
         success: true,
-        user: { name: user.name, email: user.email },
-        accessToken, // Access token can stay in memory/JSON
+        user: {
+          name: user.name,
+          email: user.email,
+        },
+        accessToken,
+        refreshToken, // 🔥 REQUIRED for React Native
       },
-      { status: 200 },
+      { status: 200 }
     );
-
-    // Set Refresh Token in a secure cookie
-    response.cookies.set("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      path: "/",
-    });
-
-    return response;
   } catch (err) {
     console.error("Login Error:", err);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Server error" },
+      { status: 500 }
+    );
   }
 }
