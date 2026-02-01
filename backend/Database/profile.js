@@ -12,7 +12,7 @@ const profileSchema = new mongoose.Schema({
     unique: true 
   },
   desc: { type: String, required: false },
-  age: { type: Number, required: false,default:null},
+  age: { type: Number, required: false,default:false},
   role: { type: String, required: false },
 }, { timestamps: true }); 
 
