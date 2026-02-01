@@ -1,22 +1,23 @@
 // app/middleware.js
 import { NextResponse } from "next/server";
 
+// Allowed origin(s)
 const ALLOWED_ORIGINS = ["*"]; 
 
-export function middleware(req) { // Note: ensure this is named 'middleware' for Next.js
+export function proxy(req) {
   // Handle preflight OPTIONS request
   if (req.method === "OPTIONS") {
     const res = new NextResponse(null, { status: 204 }); 
-    res.headers.set("Access-Control-Allow-Origin", "*"); // Use "*" directly if ALLOWED_ORIGINS is ["*"]
-    res.headers.set("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS"); // Added PATCH
+    res.headers.set("Access-Control-Allow-Origin", ALLOWED_ORIGINS.join(","));
+    res.headers.set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS,PATCH");
     res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
     return res;
   }
 
   // For other requests
   const res = NextResponse.next();
-  res.headers.set("Access-Control-Allow-Origin", "*");
-  res.headers.set("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS"); // Added PATCH
+  res.headers.set("Access-Control-Allow-Origin", ALLOWED_ORIGINS.join(","));
+  res.headers.set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS,PATCH");
   res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
   return res;
 }
