@@ -22,7 +22,6 @@ export async function GET(req) {
 
   
     const signatureString = `folder=${folder}&timestamp=${timestamp}&upload_preset=${upload_preset}${cloudinary.config().api_secret}`;
-    console.log(cloudinary.config())
     const signature = crypto.createHash("sha1").update(signatureString).digest("hex");
     return NextResponse.json({
         timestamp,
