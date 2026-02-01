@@ -7,15 +7,15 @@ import { headers } from "next/headers";
 export async function GET(req, { params }) {
   try {
     await connectToDb();
-    const headersList = await headers();
-    const authHeader = headersList.get("authorization")
-    if(!authHeader)
-      return NextResponse.json({message:"Missing token"},{status:401});
+    const headersList= await headers();
+    const token = headersList.get("authorization");
+    if (!token)
+      return NextResponse.json({ message: "Missing token" }, { status: 401 });
 
-    const accessToken = authHeader.split(" ")[1];
-   if(!accessToken)
-    return NextResponse.json({message:"Missing token"},{status:401});
-  
+    const accessToken = token.split(" ")[1];
+    if (!accessToken)
+      return NextResponse.json({ message: "Missing token" }, { status: 401 });
+
     const decoded = verifyToken(accessToken, "APP");
     if (!decoded && !decoded.email) {
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
@@ -35,9 +35,8 @@ export async function GET(req, { params }) {
       return res.status(400).json({ message: "Invalid search term" });
     }
 
-
-    const users = await Profile.find({
-      name: { $regex: new RegExp(cleanName, "i") }
+    const profile = await Profile.find({
+      name: { $regex: new RegExp(cleanName, "i") },
     }).limit(10);
     if (!profile) {
       return NextResponse.json(
