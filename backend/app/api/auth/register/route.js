@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { connectToDb } from "@/app/utils/mongo";
 import User from "@/Database/auth";
+import Profile from "@/Database/profile";
 import { generateVerificationToken } from "@/app/utils/token";
 import { redisSet } from "@/app/utils/redis";
 import { sendVerificationEmail } from "@/app/utils/mailer";
@@ -61,10 +62,17 @@ export async function POST(req) {
       isVerified: false,
       tokenVersion: 0,
     });
-
+    const newProfile = new Profile({
+      name,
+      email,
+      desc: "",
+      age: 0,
+      role: "",
+    });
+    await newProfile.save();
+    await newUser.save();
     const token = generateVerificationToken(newUser._id.toString());
 
-    // 3️⃣ Set token and expiration in MongoDB
     newUser.verificationToken = token;
     newUser.verificationTokenExpires = new Date(
       Date.now() + 24 * 60 * 60 * 1000,
