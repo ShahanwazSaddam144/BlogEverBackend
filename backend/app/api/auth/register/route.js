@@ -66,7 +66,7 @@ export async function POST(req) {
       name,
       email,
       desc: "",
-      age: 0,
+      age: null,
       role: "",
     });
     await newProfile.save();

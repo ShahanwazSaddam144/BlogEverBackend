@@ -40,7 +40,7 @@ export async function GET(req, { params }) {
 
   
     return NextResponse.json({
-      ...userProfile._doc,
+      ...userProfile,
       blogs: userBlogs,
     }, { status: 200 })
   } catch (error) {
