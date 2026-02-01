@@ -34,7 +34,7 @@ export async function GET(req, { params }) {
     if (!cleanName) {
       return res.status(400).json({ message: "Invalid search term" });
     }
-
+    
     const profile = await Profile.find({
       name: { $regex: new RegExp(cleanName, "i") },
     }).limit(10);
