@@ -17,7 +17,7 @@ export async function GET(req) {
       return NextResponse.json({message:"Missing token"},{status:401});
     }
     const decoded = verifyToken(accessToken,"APP");
-    if(!decoded && !decoded.email){
+    if(!decoded && !decoded.user.email){
       return NextResponse.json({message:"Invalid token"},{status:401});
     }
     
