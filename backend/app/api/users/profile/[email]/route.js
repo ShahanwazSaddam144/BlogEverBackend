@@ -26,25 +26,34 @@ export async function GET(req, { params }) {
       return NextResponse.json({ message: "Email not found" }, { status: 400 });
     }
     if (typeof email !== "string" || !validator.isEmail(email)) {
-      return NextResponse.json({ message: "Invalid email" }, { status: 400 })
-   
+      return NextResponse.json({ message: "Invalid email" }, { status: 400 });
     }
-    const decodedEmail= decodeURIComponent(email);
+    const decodedEmail = decodeURIComponent(email);
 
-    const userProfile = await Profile.findOne({ email:decodedEmail }).lean();
+    const userProfile = await Profile.findOne({ email: decodedEmail }).lean();
 
     if (!userProfile) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 })
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
-    const userBlogs = await Blog.findOne({ userId: userProfile._id }).sort({ createdAt: -1 }).lean();
+    const userBlogs = await Blog.find({
+      email: userProfile.email,
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+      console.log(userBlogs)
 
-  
-    return NextResponse.json({
-      ...userProfile,
-      blogs: userBlogs,
-    }, { status: 200 })
+    return NextResponse.json(
+      {
+        ...userProfile,
+        blogs: userBlogs,
+      },
+      { status: 200 },
+    );
   } catch (error) {
-    console.log(error)
-     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
+    console.log(error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }
