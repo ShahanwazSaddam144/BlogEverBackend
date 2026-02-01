@@ -8,8 +8,15 @@ export async function GET(req, { params }) {
   try {
     await connectToDb();
     const headersList = await headers();
-    const authHeader = headersList.get("authorization").split(" ")[1];
-    const decoded = verifyToken(authHeader, "APP");
+    const authHeader = headersList.get("authorization")
+    if(!authHeader)
+      return NextResponse.json({message:"Missing token"},{status:401});
+
+    const accessToken = authHeader.split(" ")[1];
+   if(!accessToken)
+    return NextResponse.json({message:"Missing token"},{status:401});
+  
+    const decoded = verifyToken(accessToken, "APP");
     if (!decoded && !decoded.email) {
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
