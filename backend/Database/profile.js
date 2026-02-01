@@ -11,9 +11,9 @@ const profileSchema = new mongoose.Schema({
     required: true, 
     unique: true 
   },
-  desc: { type: String, required: true },
-  age: { type: Number, required: true },
-  role: { type: String, required: true },
+  desc: { type: String, required: false },
+  age: { type: Number, required: false },
+  role: { type: String, required: false },
 }, { timestamps: true }); 
 
 
