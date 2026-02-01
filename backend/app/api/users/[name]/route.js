@@ -7,7 +7,7 @@ import { headers } from "next/headers";
 export async function GET(req, { params }) {
   try {
     await connectToDb();
-    const headersList= await headers();
+    const headersList = await headers();
     const token = headersList.get("authorization");
     if (!token)
       return NextResponse.json({ message: "Missing token" }, { status: 401 });
@@ -34,10 +34,12 @@ export async function GET(req, { params }) {
     if (!cleanName) {
       return res.status(400).json({ message: "Invalid search term" });
     }
-    
+
     const profile = await Profile.find({
       name: { $regex: new RegExp(cleanName, "i") },
-    }).limit(10);
+    })
+      .select("name email role -_id")
+      .limit(10);
     if (!profile) {
       return NextResponse.json(
         { message: "Profile not found" },
