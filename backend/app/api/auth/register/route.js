@@ -65,9 +65,6 @@ export async function POST(req) {
     const newProfile = new Profile({
       name,
       email,
-      desc: "",
-      age: false,
-      role: "",
     });
     await newProfile.save();
     await newUser.save();
